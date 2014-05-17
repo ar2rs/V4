@@ -77,9 +77,24 @@ function goto_expedition(){
 
 // ---------------------------------------------------------------- papildfunkcijas
 	function save_results(){//staadaa korekti;
+		
+		
+		foreach ($this->Q as $key => $value){
+			foreach ($value as $key1 => $value1){
+				$this->revard = 1;
+				$this->current_state = $key;
+				$this->next_state = $key1;
+				if ($this->current_state != $this->next_state) {
+					$this->calculate_Q();;
+				}
+				
+			}
+
+		}
+		
 		echo 'I have learned only  so many things:';
 			print_r2($this->Q);
-			print_r2($this->R);
+			//print_r2($this->R);
 				
 		echo '<p> I have in my bag : </p>';
 			print_r2($this->bag);
@@ -173,6 +188,7 @@ function goto_expedition(){
 			$Qresult = -1;
 		}
 		else {
+			if ($this->current_state != $this->next_state){
 			//Rēķinaam Qresult ko saglabaat Q matricaa;
 			$maxQ = 0;
 			//atrodam maksimlo Q jaunajam stvoklim;
@@ -187,6 +203,11 @@ function goto_expedition(){
 			}
 			$Qresult = $this->revard + $this->gamma * $maxQ;
 		}
+		else{
+			$Qresult = ($this->revard == 100 ? 100: 0);
+		}
+		}
+		
 		$this->Q[$this->current_state][$this->next_state] = $Qresult;
 	}
 	
