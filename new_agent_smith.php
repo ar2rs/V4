@@ -159,9 +159,18 @@ function goto_expedition(){
 		
 		//sÅ«tam papildspÄ“ku pieprasÄ«jumu
 		
+		$this->Q_and_R($hit);
+		
 		$this->send_backup($backup_needed);
-
+			
+		
 	}
+	
+	function Q_and_R($hit){
+		$probability = $hit/$this->bullets;
+	}
+	
+	
 	
 	function send_backup($request_list){
 	
@@ -180,6 +189,7 @@ function goto_expedition(){
 		if (count($agent_list) > $agents_in_duty) {
 			echo '<br> new agent needed @'.$agent_list[count($agent_list)-1][0][0].$agent_list[count($agent_list)-1][0][1];
 			echo '</br>';
+			print_r2($agent_list);
 			new Agent_smith($this->ID, $global_bag);
 		}
 	}

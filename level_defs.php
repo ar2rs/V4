@@ -62,7 +62,7 @@ function translate_action($ID, $current_state, $action){
 			$next_state = $current_state + 1;
 			break;
 		case 3:
-			$next_state = $current_state - round(SQRT(get_len($ID)));
+			$next_state = $current_state - round(SQRT(get_len($ID)+0.6));
 			break;	
 		case 4:
 			$next_state = $current_state + round(SQRT(get_len($ID)+0.4));
@@ -95,11 +95,11 @@ function get_reward($ID, $current_state, $action) {
 	$coordinates[1] = translate_action($ID, $current_state, $action);
 
 	
-	
 	global ${translate_id($ID)};
 	$array = ${translate_id($ID)};
 
 	$reward = get_value($array, $coordinates);
+	
 	
 	if ($reward === ''){
 		$reward = -1;
@@ -153,8 +153,7 @@ function apply_action($ID, $current_state, $action, $bag){
 	
 	
 	if ($ID == 1){
-		echo 'level 1';
-			if ($next_state == 5){
+		if ($next_state == 5){
 			If($bag != [1,1]){
 				$reward = -1;	
 				$next_state = $current_state;	
@@ -174,7 +173,14 @@ function apply_action($ID, $current_state, $action, $bag){
 				$next_state = $current_state;
 			}
 		}
-		
+	if ($ID == 0){
+		if ($next_state == 1){
+			if ($bag[0] != 1 or $bag[1] != 1) {
+				$reward = - 1;
+				$next_state = $current_state;
+			}	
+		}
+	}
 		
 	}
 	
@@ -202,5 +208,5 @@ function print_Q1($ID){
 	
 }
 
-//print_r(apply_action(1, 3, 2, [0,0]));
+//print_r(apply_action(2, 13, 3, [0,0]));
 ?>
