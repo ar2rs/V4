@@ -3,26 +3,7 @@ include 'functions.php';
 include 'level_defs.php';
 include 'backup.php';
 
-function send_backup($request_list){
-	
-	global $agent_list;
-	global $global_bag;
-	
-	$agents_in_duty = count($agent_list);
-	echo $agents_in_duty;
-	
-	if(count($request_list) != 0){
-		array_push($agent_list, $request_list);
-	}
-	
-	$agent_list = array_map("unserialize", array_unique(array_map("serialize", $agent_list)));
-	
-	if (count($agent_list) > $agents_in_duty) {
-		echo '<br> new agent needed @'.$agent_list[count($agent_list)-1][0][0].$agent_list[count($agent_list)-1][0][1];
-		echo '</br>';
-		new Agent_smith($agent_list[count($agent_list)-1][0][0], $global_bag);
-	}	
-}
+
 
 class Agent_smith{
 
@@ -178,7 +159,29 @@ function goto_expedition(){
 		
 		//sÅ«tam papildspÄ“ku pieprasÄ«jumu
 		
-		send_backup($backup_needed);
+		$this->send_backup($backup_needed);
 
 	}
+	
+	function send_backup($request_list){
+	
+		global $agent_list;
+		global $global_bag;
+	
+		$agents_in_duty = count($agent_list);
+		
+	
+		if(count($request_list) != 0){
+			array_push($agent_list, $request_list);
+		}
+	
+		$agent_list = array_map("unserialize", array_unique(array_map("serialize", $agent_list)));
+	
+		if (count($agent_list) > $agents_in_duty) {
+			echo '<br> new agent needed @'.$agent_list[count($agent_list)-1][0][0].$agent_list[count($agent_list)-1][0][1];
+			echo '</br>';
+			new Agent_smith($this->ID, $global_bag);
+		}
+	}
+	
 }

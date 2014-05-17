@@ -4,7 +4,7 @@
 
 static $agent_list = [];
 
-$global_bag = [1,0];
+$global_bag = [0,0];
 $start_at = 0;
 
 
