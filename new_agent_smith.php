@@ -89,13 +89,15 @@ function Learn(){
 			}
 
 		}
-		
+		echo '<br>';
 		echo 'I have learned only  so many things:';
 			print_r2($this->Q);
 			print_r2($this->R);
-				
+		echo '</br>';
+		echo '<br>';
 		echo '<p> I have in my bag : </p>';
-			//print_r2($this->bag);
+			print_r2($this->bag);
+		echo '</br>';
 	}
 	
 	function take_one_step(){//strdaa korekti
@@ -278,8 +280,11 @@ function Use_results(){
 		
 		$this->policy[$key1][$next_state] = $this->get_action($key1, $next_state);
 		
+		echo '<br>';
+		echo '<p> To achive goals I must do this : </p>';
+		print_r2($this->policy);
+		echo '</br>';
 	}
-	print_r2($this->policy); ///-----------
 }	
 	
 	function get_action($current_state, $next_state){
