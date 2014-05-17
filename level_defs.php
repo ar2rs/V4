@@ -129,7 +129,6 @@ function apply_action($ID, $current_state, $action, $bag){
 		$next_state = $current_state;
 	}
 	
-
 	// balvas par somas saturu
 	if ($ID == 2){
 		if ( $next_state == 11) {
@@ -151,7 +150,7 @@ function apply_action($ID, $current_state, $action, $bag){
 		}
 	}
 	
-	
+
 	if ($ID == 1){
 		if ($next_state == 5){
 			If($bag != [1,1]){
@@ -173,17 +172,16 @@ function apply_action($ID, $current_state, $action, $bag){
 				$next_state = $current_state;
 			}
 		}
+	}
+	
 	if ($ID == 0){
 		if ($next_state == 1){
 			if ($bag[0] != 1 or $bag[1] != 1) {
 				$reward = - 1;
 				$next_state = $current_state;
-			}	
+			}
 		}
 	}
-		
-	}
-	
 	
 	
 	$results = [];
@@ -208,5 +206,5 @@ function print_Q1($ID){
 	
 }
 
-//print_r(apply_action(2, 13, 3, [0,0]));
+//print_r(apply_action(0, 0, 2, [1,1]));
 ?>

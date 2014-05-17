@@ -120,9 +120,9 @@ function goto_expedition(){
 			//skaitam pozitÄ«vos iznÄ�kumus
 			$hit += ($experiment[1] > -1 ? 1 : 0);
 			
-			echo '<br>';
-			echo $this->current_state;
-			echo $this->action;
+			//echo '<br>';
+			//echo $this->current_state;
+			//echo $this->action;
 			
 			//pieprasam jaunu klasi jaunam lÄ«menim
 			if ($experiment[1] == 50){
@@ -149,25 +149,53 @@ function goto_expedition(){
 
 		}
 		
+		$this->revard = $experiment[1];
+		
 		$backup_needed = array_map("unserialize", array_unique(array_map("serialize", $backup_needed)));
 		
-		echo $this->next_state;
-		echo '</br>';
+		//echo $this->next_state;
+		//echo '</br>';
+		
+		$this->Q_and_R($hit);
 		
 		// pÄ�rejam uz jauno stÄ�vokli
 		$this->current_state = $this->next_state;
 		
 		//sÅ«tam papildspÄ“ku pieprasÄ«jumu
-		
-		$this->Q_and_R($hit);
-		
 		$this->send_backup($backup_needed);
 			
 		
 	}
 	
+	function calculate_Q (){
+		//aprēķinam $Qresult
+		if ($this->revard < 0) {
+			$Qresult = -1;
+		}
+		else {
+			//Rēķinaam Qresult ko saglabaat Q matricaa;
+			$maxQ = 0;
+			//atrodam maksimlo Q jaunajam stvoklim;
+				
+			If(array_key_exists(intval($this->current_state), $this->Q) == True ){
+				$row = $this->Q[$this->current_state];
+				foreach ($row as $element){
+					If ($element > $maxQ){
+						$maxQ = $element;
+					}
+				}
+			}
+			$Qresult = $this->revard + $this->gamma * $maxQ;
+		}
+		$this->Q[$this->current_state][$this->next_state] = $Qresult;
+	}
+	
+	
 	function Q_and_R($hit){
 		$probability = $hit/$this->bullets;
+		$this->R[$this->current_state][$this->next_state] = $probability;
+		
+		$this->calculate_Q();
 	}
 	
 	
@@ -189,7 +217,6 @@ function goto_expedition(){
 		if (count($agent_list) > $agents_in_duty) {
 			echo '<br> new agent needed @'.$agent_list[count($agent_list)-1][0][0].$agent_list[count($agent_list)-1][0][1];
 			echo '</br>';
-			print_r2($agent_list);
 			new Agent_smith($this->ID, $global_bag);
 		}
 	}
