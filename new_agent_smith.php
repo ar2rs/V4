@@ -28,6 +28,7 @@ class Agent_smith{
 	
 	private $target = 0;
 	private $experiments = [];
+	private $policy = [];
 
 
 function __construct($ID, &$bag){
@@ -35,9 +36,10 @@ function __construct($ID, &$bag){
 		$this->uniq_id = counter();
 		$this->bag = &$bag;
 		$this->Learn();
+		$this->Use_results();
 	}
 	
-	function Learn(){
+function Learn(){
 		echo 'Hello here is my full name -> '.$this->ID.'   '.$this->unique_id;
 			print_r2($this->bag);
 			
@@ -58,8 +60,7 @@ function __construct($ID, &$bag){
 	$this->save_results();
 	}
 	
-	
-function goto_expedition(){
+	function goto_expedition(){
 	
 	// Iet pa soÄ¼iem uz priekÅ�u kamÄ“r atrod mÄ“rÄ·i
 	while ( $this->target == 0){
@@ -73,9 +74,6 @@ function goto_expedition(){
 	}
 }
 
-
-
-// ---------------------------------------------------------------- papildfunkcijas
 	function save_results(){//staadaa korekti;
 		
 		
@@ -85,7 +83,7 @@ function goto_expedition(){
 				$this->current_state = $key;
 				$this->next_state = $key1;
 				if ($this->current_state != $this->next_state) {
-					$this->calculate_Q();;
+					$this->calculate_Q();
 				}
 				
 			}
@@ -94,10 +92,10 @@ function goto_expedition(){
 		
 		echo 'I have learned only  so many things:';
 			print_r2($this->Q);
-			//print_r2($this->R);
+			print_r2($this->R);
 				
 		echo '<p> I have in my bag : </p>';
-			print_r2($this->bag);
+			//print_r2($this->bag);
 	}
 	
 	function take_one_step(){//strdaa korekti
@@ -208,9 +206,9 @@ function goto_expedition(){
 		}
 		}
 		
+		$Qresult = $Qresult * $this->R[$this->current_state][$this->next_state];
 		$this->Q[$this->current_state][$this->next_state] = $Qresult;
 	}
-	
 	
 	function Q_and_R($hit){
 		$probability = $hit/$this->bullets;
@@ -218,8 +216,6 @@ function goto_expedition(){
 		
 		$this->calculate_Q();
 	}
-	
-	
 	
 	function send_backup($request_list){
 	
@@ -241,5 +237,56 @@ function goto_expedition(){
 			new Agent_smith($this->ID, $global_bag);
 		}
 	}
+
+	function find_action($ID, $current_state, $next_state){
+
+		$a =  $next_state -$current_state ;
+		$c = $current_state - round(SQRT(get_len($ID)+0.4));
 	
+		if ($current_state == $next_state) {
+			$action = 0;
+		}
+		
+		if ($next_state + 1 == $current_state) {
+			$action = 1;
+		}
+		
+		if ($next_state - 1 == $current_state){
+			$action = 2;
+		}
+		
+		
+		if ($next_state + round(SQRT(get_len($ID)+0.6)) == $current_state) {
+			$action = 3;
+		}
+		
+		if ($next_state - round(SQRT(get_len($ID)+0.4)) == $current_state) {
+			$action = 4;
+		}
+		
+		return $action;
+	}
+	
+function Use_results(){
+	$this->policy = [];
+	foreach ($this->Q as $key1 => $row){
+		$maxval = 0;
+		foreach ($row as $key2 => $element){
+			$maxval = ($element > $maxval ? $element : $maxval);
+		}
+		$next_state = array_search($maxval, $row);
+		
+		$this->policy[$key1][$next_state] = $this->get_action($key1, $next_state);
+		
+	}
+	print_r2($this->policy); ///-----------
+}	
+	
+	function get_action($current_state, $next_state){
+		
+		$result = $this->find_action($this->ID, $current_state, $next_state);
+		return $result;
+	}
+	
+
 }

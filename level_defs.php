@@ -206,5 +206,9 @@ function print_Q1($ID){
 	
 }
 
+
+
+
+
 //print_r(apply_action(0, 0, 2, [1,1]));
 ?>
