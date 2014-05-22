@@ -76,23 +76,25 @@ function Learn(){
 
 	function save_results(){//staadaa korekti;
 		
-		
-		foreach ($this->Q as $key => $value){
-			foreach ($value as $key1 => $value1){
-				$this->revard = 1;
-				$this->current_state = $key;
-				$this->next_state = $key1;
-				if ($this->current_state != $this->next_state) {
-					$this->calculate_Q();
+		for ($i = 0; $i < 2; $i++) {
+			foreach ($this->Q as $key => $value){
+				foreach ($value as $key1 => $value1){
+					$this->revard = 1;
+					$this->current_state = $key;
+					$this->next_state = $key1;
+					if ($this->current_state != $this->next_state) {
+						$this->calculate_Q();
+					}
+			
 				}
-				
+			
 			}
-
 		}
+
 		echo '<br>';
 		echo 'I have learned only  so many things:';
 			print_r2($this->Q);
-			print_r2($this->R);
+		//	print_r2($this->R);
 		echo '</br>';
 		echo '<br>';
 		echo '<p> I have in my bag : </p>';
@@ -204,7 +206,7 @@ function Learn(){
 			$Qresult = $this->revard + $this->gamma * $maxQ;
 		}
 		else{
-			$Qresult = ($this->revard == 100 ? 100: 0);
+			$Qresult = ($this->revard == 100 ? 100+$this->gamma*100 : 0);
 		}
 		}
 		
@@ -280,11 +282,12 @@ function Use_results(){
 		
 		$this->policy[$key1][$next_state] = $this->get_action($key1, $next_state);
 		
-		echo '<br>';
-		echo '<p> To achive goals I must do this : </p>';
-		print_r2($this->policy);
-		echo '</br>';
+
 	}
+	echo '<br>';
+	echo '<p> To achive goals I must do this : </p>';
+	print_r2($this->policy);
+	echo '</br>';
 }	
 	
 	function get_action($current_state, $next_state){
