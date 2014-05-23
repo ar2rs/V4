@@ -1,6 +1,6 @@
 <?php
 include 'functions.php';
-include 'level_defs.php';
+include 'New_world_order.php';
 include 'backup.php';
 
 
@@ -29,12 +29,14 @@ class Agent_smith{
 	private $target = 0;
 	private $experiments = [];
 	private $policy = [];
+	private $reset_bag;
 
 
 function __construct($ID, &$bag){
 		$this->ID = $ID+1;
 		$this->uniq_id = counter();
 		$this->bag = &$bag;
+		$this->reset_bag = $bag;
 		$this->Learn();
 		$this->Use_results();
 	}
@@ -43,105 +45,86 @@ function Learn(){
 		echo 'Hello here is my full name -> '.$this->ID.'   '.$this->unique_id;
 			print_r2($this->bag);
 			
-			$reset_bag = $this->bag;
 		for ($i = 0; $i < $this->expeditions; $i++) {
-			$this->bag = $reset_bag;
-			
-			//sagatavojam mainÄ«gos;
+			$this->bag = $this->reset_bag;
 			$this->current_state = 0;
 			$this->target = 0;
 			$this->next_state = 0;
 			
-			//dodamies ekspedÄ«cijÄ�
 			$this->goto_expedition();
 
 		}
-	//apmÄ�cÄ«bas beigas - saglabÄ�jam/izvadam rezultÄ�tus Q un R;
+	
 	$this->save_results();
 	}
 	
-	function goto_expedition(){
-	
-	// Iet pa soÄ¼iem uz priekÅ�u kamÄ“r atrod mÄ“rÄ·i
+function goto_expedition(){
+
 	while ( $this->target == 0){
-		
-		//speram vienu soli	
 		$this->take_one_step();
-		
-		//apskatamies, kas no Å�Ä« soÄ¼a ir iznÄ�cis
 		$this->look_at_results();
-		
 	}
+
+	$this->action = 0;
+	$this->experiments = [];
+	for($i = 0; $i<$this->bullets; $i++){
+		$exp_result = apply_action($this->ID, $this->current_state, $this->action, $this->bag);
+		array_push($this->experiments, $exp_result);
+	}
+	
+	$this->look_at_results();
 }
 
-	function save_results(){//staadaa korekti;
-		
+	function save_results(){
+		$a = array_reverse($this->Q, TRUE);
 		for ($i = 0; $i < 2; $i++) {
-			foreach ($this->Q as $key => $value){
-				foreach ($value as $key1 => $value1){
-					$this->revard = 1;
-					$this->current_state = $key;
-					$this->next_state = $key1;
-					if ($this->current_state != $this->next_state) {
-						$this->calculate_Q();
+		
+		foreach ($a as $key=>$row){
+			foreach ($row as $key2=>$cell){
+				$this->current_state = $key;
+				$this->next_state = $key2;
+				$this->revard = 1;
+				
+				$maxQ = 1;
+				
+				$line = $this->Q[$this->next_state];
+				foreach ($line as $element){
+					If ($element > $maxQ){
+						$maxQ = $element;
 					}
-			
 				}
-			
+				$Qresult = $this->Q[$key][$key2] + $this->gamma * $maxQ;
+				
+				$Qresult = $Qresult * $this->R[$this->current_state][$this->next_state];
+				$this->Q[$this->current_state][$this->next_state] = $Qresult;
+				
 			}
 		}
-
-		echo '<br>';
-		echo 'I have learned only  so many things:';
-			print_r2($this->Q);
-		//	print_r2($this->R);
-		echo '</br>';
-		echo '<br>';
-		echo '<p> I have in my bag : </p>';
-			print_r2($this->bag);
-		echo '</br>';
+		}
+		print_r2($this->Q);
+		print_r2($this->bag);
 	}
 	
 	function take_one_step(){//strdaa korekti
-		//izvÄ“lamies darbÄ«bu
 		$this->choose_an_action();
-
-		//eksperimentÄ“jam ar darbÄ«bu
 		$this->experiments = [];
-		
 		for($i = 0; $i<$this->bullets; $i++){
-			//katrÄ� experimentÄ� mÄ“s iegÅ«stam jauno stÄ�vokli, balvu par darbÄ«bu un somas saturu;
 			$exp_result = apply_action($this->ID, $this->current_state, $this->action, $this->bag);
 			array_push($this->experiments, $exp_result);
-
 		}		
-		
 	}
 	
 	function choose_an_action(){ //straadaa korekti
-		//izvÄ“lamies nejauÅ�u darbÄ«bu
 		$this->action = mt_rand(0,4);
 	}
 	
 	function look_at_results(){
-		//apskatam visus izdarÄ«tos eksperimentus Å�ajÄ� solÄ«;
-		/*
-		/	| NR. | Jaunais_stavoklis | balva | somas saturs |
-		*/
-		//meklÄ“jam lÄ«meÅ†us, jauno stÄ�vokli, pÄ�rejas varbÅ«tÄ«bu
 		$backup_needed = [];
 		$probability = 0;
 		$hit = 0;
 
 		foreach($this->experiments as $experiment){
-			//skaitam pozitÄ«vos iznÄ�kumus
 			$hit += ($experiment[1] > -1 ? 1 : 0);
-			
-			//echo '<br>';
-			//echo $this->current_state;
-			//echo $this->action;
-			
-			//pieprasam jaunu klasi jaunam lÄ«menim
 			if ($experiment[1] == 50){
 				$report = [];
 				$report[0] = $this->ID;
@@ -152,12 +135,12 @@ function Learn(){
 				array_push($backup_needed, $report);
 			}
 			if ($experiment[1] > -1){
-				//jaunais stÄ�voklis
+				//jaunais stĆ„ļæ½voklis
 					$this->next_state = ($this->current_state != $experiment[0] ? $experiment[0]:$this->current_state);
 				
 			}
 			
-			//mÄ“rÄ·is sasniegts
+			//mĆ„ā€�rĆ„Ā·is sasniegts
 			$this->target = ($experiment[1] > 50 ? 1 : 0);
 			
 			
@@ -175,39 +158,39 @@ function Learn(){
 		
 		$this->Q_and_R($hit);
 		
-		// pÄ�rejam uz jauno stÄ�vokli
+		// pĆ„ļæ½rejam uz jauno stĆ„ļæ½vokli
 		$this->current_state = $this->next_state;
 		
-		//sÅ«tam papildspÄ“ku pieprasÄ«jumu
+		//sĆ…Ā«tam papildspĆ„ā€�ku pieprasĆ„Ā«jumu
 		$this->send_backup($backup_needed);
 			
 		
 	}
 	
 	function calculate_Q (){
-		//aprēķinam $Qresult
+		//aprÄ“Ä·inam $Qresult
 		if ($this->revard < 0) {
 			$Qresult = -1;
 		}
-		else {
+		else {/*
 			if ($this->current_state != $this->next_state){
-			//Rēķinaam Qresult ko saglabaat Q matricaa;
-			$maxQ = 0;
-			//atrodam maksimlo Q jaunajam stvoklim;
-				
-			If(array_key_exists(intval($this->current_state), $this->Q) == True ){
-				$row = $this->Q[$this->current_state];
-				foreach ($row as $element){
-					If ($element > $maxQ){
-						$maxQ = $element;
+				//RÄ“Ä·inaam Qresult ko saglabaat Q matricaa;
+				$maxQ = 0;
+				//atrodam maksimlo Q jaunajam stvoklim;
+					
+				If(array_key_exists(intval($this->next_state), $this->Q) == True ){
+					$row = $this->Q[$this->next_state];
+					foreach ($row as $element){
+						If ($element > $maxQ){
+							$maxQ = $element;
+						}
 					}
 				}
-			}
-			$Qresult = $this->revard + $this->gamma * $maxQ;
-		}
-		else{
+				$Qresult = $this->revard + $this->gamma * $maxQ;
+			}	
+			else{*/
 			$Qresult = ($this->revard == 100 ? 100+$this->gamma*100 : 0);
-		}
+			
 		}
 		
 		$Qresult = $Qresult * $this->R[$this->current_state][$this->next_state];
@@ -227,8 +210,6 @@ function Learn(){
 		global $global_bag;
 	
 		$agents_in_duty = count($agent_list);
-		
-	
 		if(count($request_list) != 0){
 			array_push($agent_list, $request_list);
 		}
@@ -244,9 +225,8 @@ function Learn(){
 
 	function find_action($ID, $current_state, $next_state){
 
-		$a =  $next_state -$current_state ;
-		$c = $current_state - round(SQRT(get_len($ID)+0.4));
-	
+		$action = -1;
+		
 		if ($current_state == $next_state) {
 			$action = 0;
 		}
@@ -258,7 +238,6 @@ function Learn(){
 		if ($next_state - 1 == $current_state){
 			$action = 2;
 		}
-		
 		
 		if ($next_state + round(SQRT(get_len($ID)+0.6)) == $current_state) {
 			$action = 3;
@@ -287,6 +266,7 @@ function Use_results(){
 	echo '<br>';
 	echo '<p> To achive goals I must do this : </p>';
 	print_r2($this->policy);
+	print_r2($this->bag);
 	echo '</br>';
 }	
 	
@@ -296,5 +276,5 @@ function Use_results(){
 		return $result;
 	}
 	
-
+	
 }
